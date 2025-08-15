@@ -206,4 +206,4 @@ prueba-dev-qa/
 ---
 
 ## Créditos
-Proyecto creado por Jhon Fisgerald Urueña Prieto, con una mano extra de la IA para documentar, organizar ideas y descubrir tecnologías nuevas.
+Proyecto creado por Jhon Fisgerald Urueña Prieto para prueba tecnica para la compañia Finanzauto, es proyecto se realizo con mis conocimientos junto con una mano extra de la IA para documentar, organizar ideas y descubrir tecnologías nuevas.
