@@ -104,7 +104,7 @@ Este comando construye imágenes, levanta contenedores en segundo plano e instal
 
 ### Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/prueba-dev-qa.git
+git clone https://github.com/Jhonuruena/prueba-dev-qa.git
 cd prueba-dev-qa
 ```
 
