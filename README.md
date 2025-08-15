@@ -1,35 +1,35 @@
-# Prueba Técnica QA - Suite de Automatización
+# Prueba Técnica QA - Suite de Automatización Completa
 
-Este proyecto implementa una suite completa de pruebas automatizadas para 4 aplicaciones web públicas:
+Este repositorio contiene una suite completa de pruebas automatizadas para múltiples APIs y aplicaciones web públicas, completamente dockerizada y lista para ejecutarse como parte de prueba tecnica de Jhon Urueña para el cargo de Desarrollador QA 
 
-- JSONPlaceholder
-- ReqRes
-- The Internet - Herokuapp
-- Swagger Petstore
+## Aplicaciones bajo prueba
 
-Cumple con los requisitos de pruebas API, E2E, performance para la prueba desarrollador QA Jhon Urueña.
+- JSONPlaceholder API: https://jsonplaceholder.typicode.com/
+- ReqRes API: https://reqres.in/
+- The Internet (Herokuapp): https://the-internet.herokuapp.com/
+- Swagger Petstore: https://petstore.swagger.io/
 
+---
+
+## Cobertura de Pruebas
 
 ### JSONPlaceholder API
-[https://jsonplaceholder.typicode.com](https://jsonplaceholder.typicode.com)
-
 - CRUD completo en `/posts`: GET, POST, PUT, DELETE
-- Validación de datos: Tipos (`int`, `str`), campos requeridos
+- Validación de datos: tipos (`int`, `str`) y campos requeridos
 - Relaciones:
   - `/posts/{id}/comments` → Verifica que los comentarios pertenezcan al post
   - `/users/{id}/posts` → Verifica que los posts pertenezcan al usuario
 - Casos negativos:
   - IDs inexistentes → `GET /posts/999999` → 404
-  - Payloads inválidos → `POST` con campos null
+  - Payloads inválidos → `POST` con campos `null`
   - Métodos no permitidos → `PUT /posts` → 404 o 405
-- Performance básica: 10 requests a `/posts` con tiempo promedio < 2 segundos
+- Performance básica: 10 requests a `/posts` con tiempo promedio menor a 2 segundos
 
 **Particularidades observadas**
-- El endpoint `DELETE /posts/{id}` devuelve 200 o 204, pero no elimina realmente el recurso. Al hacer `GET` después, el post sigue disponible. Esto es esperado, ya que JSONPlaceholder es una API de prueba sin estado persistente.
+- `DELETE /posts/{id}` devuelve 200 o 204, pero no elimina realmente el recurso; un `GET` posterior sigue devolviendo el post. Esto es esperado porque JSONPlaceholder es una API de prueba sin estado persistente.
+- `GET` con IDs muy altos (por ejemplo 999999) devuelve 404; en versiones anteriores podía devolver 200 con `{}`.
 
 ### ReqRes API
-[https://reqres.in/api](https://reqres.in/api)
-
 - Autenticación:
   - `POST /api/login` → Login exitoso y fallido
   - `POST /api/register` → Registro exitoso
@@ -39,95 +39,171 @@ Cumple con los requisitos de pruebas API, E2E, performance para la prueba desarr
 - Rate limiting: 50 requests consecutivas a `/api/users` sin errores
 
 **Particularidades observadas**
-- Requiere API Key: Aunque no está bien documentado, ReqRes ahora exige el encabezado:
+- Requiere API Key en el encabezado:
   ```
   x-api-key: reqres-free-v1
   ```
-  Sin este header, responde con `401 Missing API key`.
-- Login solo funciona con credenciales predefinidas, como:
+  Sin este header responde con `401 Missing API key`.
+- Login funcional solo con credenciales predefinidas, por ejemplo:
   ```json
   {
     "email": "eve.holt@reqres.in",
     "password": "123456"
   }
   ```
-- No es posible hacer login con un correo registrado en `POST /api/register`, ya que el registro es solo una simulación.
-- El token devuelto en login/register es ficticio y no permite autenticación real en otros endpoints.
+- No es posible autenticar con el correo registrado mediante `POST /api/register` porque el registro es una simulación.
+- El token devuelto por login/register es ficticio y no sirve para autenticación real en otros endpoints.
 
-### The Internet - Herokuapp
-[https://the-internet.herokuapp.com/](https://the-internet.herokuapp.com/)
+### The Internet (Herokuapp) — Pruebas E2E con Selenium WebDriver
+- Autenticación: `/login` (usuario `tomsmith`, password `SuperSecretPassword!`)
+- Elementos dinámicos: `/dynamic_loading/1` y `/dynamic_loading/2`
+- Carga/descarga de archivos: `/upload` y `/download`
+- Interacciones complejas: `/drag_and_drop` (ActionChains)
+- Alertas de JavaScript: `/javascript_alerts` (aceptar, cancelar, enviar texto)
 
-Pruebas E2E con Selenium WebDriver
+**Casos críticos automatizados**
+- Login completo con validación de mensajes y sesión
+- Upload de archivo y verificación del resultado
+- Manejo de elementos que aparecen/desaparecen dinámicamente
+- Interacciones de arrastrar y soltar
 
-Casos críticos automatizados:
-- Login completo: `/login` → Validación de mensaje y sesión
-- Upload de archivo: `/upload` → Subida y verificación de "File Uploaded!"
-- Elementos dinámicos: `/dynamic_loading/2` → Espera explícita a contenido asíncrono
-- Interacciones complejas: `/drag_and_drop` → Arrastrar y soltar con ActionChains
-- Alertas de JavaScript: `/javascript_alerts` → Aceptar, cancelar, enviar texto
+### Swagger Petstore
+- Pruebas de endpoints de `pets` para validación funcional y escenarios de carga.
 
-### Pruebas de Performance con k6
+---
 
-**Herramienta:** k6
+## Pruebas de Performance (k6)
+- JSONPlaceholder: 100 usuarios concurrentes durante 2 minutos contra `/posts`
+- ReqRes API: 50 usuarios simultáneos contra `/api/users`
+- Swagger Petstore: aproximadamente 200 requests por minuto contra `/pet/1`
 
-**Escenarios implementados:**
-- JSONPlaceholder: 100 usuarios concurrentes durante 2 minutos en `/posts`
-- ReqRes: 50 usuarios simultáneos en `/api/users`
-- Swagger Petstore: ~200 requests/minuto en `/pet/1`
-
-**Métricas capturadas:**
+**Métricas capturadas**
 - Tiempo de respuesta promedio y p95
-- Throughput (rps)
+- Throughput (request por segundo)
 - Tasa de errores
-- Umbrales definidos para validar éxito
+- Umbrales para validar éxito y detectar puntos de quiebre
 
-## Tecnologías Usadas
-- Python 3.10+
-- pytest: Framework de pruebas
-- requests: Cliente HTTP para pruebas de API
-- Selenium WebDriver: Automatización de navegador
-- webdriver-manager: Gestión automática de ChromeDriver
-- k6: Pruebas de performance
-- JavaScript: Scripts de k6
-- Docker: Contenerización (próximamente)
+---
 
-## Cómo Ejecutar
+## Setup y Entrega
 
-Clona el repositorio:
+### Repositorio GitHub
+Código con commits descriptivos y estructura clara.
+
+### Dockerización
+Todo se ejecuta con:
+```bash
+docker-compose up -d --build
+```
+Este comando construye imágenes, levanta contenedores en segundo plano e instala dependencias. Los contenedores quedan corriendo para ejecutar pruebas manualmente si se requiere.
+
+---
+
+
+## Cómo ejecutar la suite de pruebas
+
+### Clonar el repositorio
 ```bash
 git clone https://github.com/tu-usuario/prueba-dev-qa.git
-cd prueba-tecnica-qa
+cd prueba-dev-qa
 ```
 
-Instala dependencias:
+### Levantar los contenedores
 ```bash
-pip install pytest requests selenium webdriver-manager
+docker-compose up -d --build
 ```
 
-Ejecuta las pruebas:
+### Ejecutar las pruebas
 
-**Pruebas de API - JSONPlaceholder**
-```cmd
-python -m pytest api-tests\jsonplaceholder\test_posts.py -v
-```
-
-**Pruebas de API - ReqRes**
-```cmd
-python -m pytest api-tests\reqres\test_users.py -v
-```
-
-**Pruebas E2E - The Internet**
-```cmd
-python -m pytest e2e_tests\the_internet\tests\test_login.py -v
-python -m pytest e2e_tests\the_internet\tests\test_upload.py -v
-python -m pytest e2e_tests\the_internet\tests\test_dynamic_loading.py -v
-python -m pytest e2e_tests\the_internet\tests\test_drag_and_drop.py -v
-python -m pytest e2e_tests\the_internet\tests\test_javascript_alerts.py -v
-```
-
-**Pruebas de Performance - k6**
+**Pruebas de API**
 ```bash
-k6 run performance-tests/jsonplaceholder/script.js
-k6 run performance-tests/reqres/script.js
-k6 run performance-tests/petstore/script.js
+# JSONPlaceholder (GET, POST, PUT, DELETE)
+docker-compose exec api-tests python -m pytest api-tests/jsonplaceholder/test_posts.py -v
+
+# ReqRes (login, usuarios)
+docker-compose exec api-tests python -m pytest api-tests/reqres/test_users.py -v
 ```
+
+**Pruebas E2E (The Internet)**
+```bash
+# Todas las pruebas E2E
+docker-compose exec e2e-tests python -m pytest /app/e2e_tests/the_internet/tests/ -v
+
+# Prueba específica
+docker-compose exec e2e-tests python -m pytest /app/e2e_tests/the_internet/tests/test_login.py -v
+```
+
+**Pruebas de Performance (k6)**
+```bash
+# JSONPlaceholder
+docker-compose exec performance-tests k6 run performance-tests/jsonplaceholder/script.js
+
+# ReqRes
+docker-compose exec performance-tests k6 run performance-tests/reqres/script.js
+
+# Petstore
+docker-compose exec performance-tests k6 run performance-tests/petstore/script.js
+```
+
+### Detener todo
+```bash
+docker-compose down
+```
+
+---
+
+## Estructura del proyecto
+```
+prueba-dev-qa/
+├── api-tests/
+│   ├── jsonplaceholder/
+│   └── reqres/
+├── e2e_tests/
+│   └── the_internet/
+│       ├── pages/
+│       ├── utils/
+│       └── tests/
+├── performance-tests/
+│   ├── jsonplaceholder/
+│   ├── reqres/
+│   └── petstore/               
+├── docker-compose.yml
+├── Dockerfile
+├── Dockerfile.e2e
+└── requirements.txt
+```
+
+---
+
+## Tecnologías utilizadas
+- Python 3.10+
+- pytest
+- requests
+- Selenium WebDriver
+- webdriver-manager
+- k6
+- JavaScript (scripts k6)
+- Docker y Docker Compose
+- seleniarm/standalone-chromium
+
+---
+
+## Notas técnicas
+- Todas las pruebas corren en modo headless dentro de contenedores.
+- El contenedor `e2e-tests` usa una imagen oficial de Selenium para evitar incompatibilidades encontradas por navegador y driver de navegador.
+- En pruebas E2E las rutas de archivos se construyen con `os.path.join` para compatibilidad en Docker en la prueba especifica de subir el archivo.
+- Se usa entorno virtual (venv) para evitar conflictos con PEP 668.
+
+---
+
+## Entregables completos
+- Suite de pruebas API, E2E y Performance
+- Dockerización completa
+- Documentación técnica en README
+- Commits descriptivos
+
+
+---
+
+## Créditos
+Proyecto creado por Jhon Fisgerald Urueña Prieto, con una mano extra de la IA para documentar, organizar ideas y descubrir tecnologías nuevas.

@@ -1,0 +1,19 @@
+FROM seleniarm/standalone-chromium:latest
+USER root
+
+RUN apt-get update && \
+    apt-get install -y \
+        python3.13 \
+        python3.13-venv \
+        python3-pip && \
+    python3.13 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir \
+        pytest==8.4.1 \
+        selenium==4.35.0 \
+        requests==2.32.4
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+USER seluser
+
+CMD ["tail", "-f", "/dev/null"]

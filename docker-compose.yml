@@ -1,0 +1,27 @@
+services:
+  api-tests:
+    build: .
+
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes:
+      - ./api-tests:/app/api-tests
+      - ./reports:/app/reports
+    environment:
+      - PYTHONPATH=/app
+
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    volumes:
+      - ./e2e_tests:/app/e2e_tests
+    shm_size: '2gb'
+    environment:
+      - PYTHONPATH=/app 
+
+  performance-tests:
+    build: .
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes:
+      - ./performance-tests:/app/performance-tests
+    working_dir: /app
